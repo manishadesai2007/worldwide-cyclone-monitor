@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worldwide Tropical Cyclone Monitor</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#101827;color:white}
+header{padding:25px 18px;background:#172338}
+h1{font-size:clamp(24px,5vw,38px);margin:0 0 10px}
+p{color:#cbd5e1;line-height:1.6}
+main{max-width:1000px;margin:auto;padding:18px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.card{background:#263449;padding:20px;border-radius:14px}
+.card h2{font-size:27px;margin-bottom:5px}
+.section{background:#192538;margin-top:20px;padding:18px;border-radius:14px}
+.map{width:100%;height:auto;border-radius:10px;background:#c9e8f5}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{text-align:left;padding:12px 8px;border-bottom:1px solid #39465a}
+th{color:#93c5fd}
+.note{font-size:13px;color:#fbbf24}
+footer{text-align:center;padding:25px;color:#cbd5e1}
+</style>
+</head>
+<body>
+<header>
+<h1>🌍 Worldwide Tropical Cyclone Monitor</h1>
+<p>Explore recorded cyclone locations and experimental wind estimates.</p>
+</header>
+<main>
+<div class="cards">
+<div class="card"><p>Storms tracked</p><h2>7</h2></div>
+<div class="card"><p>Highest estimated wind</p><h2>69.2 kt</h2></div>
+<div class="card"><p>Average estimated wind</p><h2>52.6 kt</h2></div>
+</div>
+
+<div class="section">
+<h2>🌐 Worldwide cyclone map</h2>
+<svg class="map" viewBox="0 0 800 400" role="img" aria-label="Illustrative world map with cyclone locations">
+<rect width="800" height="400" fill="#b9dff5"/>
+<g fill="#d9dfd8" stroke="#829ba8" stroke-width="1">
+<path d="M45 75 L90 40 160 48 210 85 190 125 145 140 120 185 82 160 65 120Z"/>
+<path d="M165 190 L215 210 230 265 205 330 175 285 160 235Z"/>
+<path d="M340 70 L390 45 435 70 420 105 370 110Z"/>
+<path d="M360 120 L425 110 470 150 450 220 415 275 390 225 375 170Z"/>
+<path d="M440 70 L520 40 620 55 720 100 685 150 620 145 580 185 520 145 470 125Z"/>
+<path d="M610 230 L675 220 720 260 690 310 635 300Z"/>
+</g>
+<g fill="#ef4444" stroke="white" stroke-width="2">
+<circle cx="535" cy="105" r="7"/><circle cx="555" cy="120" r="7"/>
+<circle cx="580" cy="90" r="7"/><circle cx="230" cy="150" r="7"/>
+<circle cx="205" cy="175" r="7"/><circle cx="250" cy="165" r="7"/>
+<circle cx="570" cy="150" r="7"/>
+</g>
+<text x="20" y="380" fill="#17324a" font-size="13">Illustrative locations only — not live geographic plotting</text>
+</svg>
+<p class="note">This illustration does not show verified current cyclone positions.</p>
+</div>
+
+<div class="section">
+<h2>📊 Experimental wind estimates</h2>
+<div style="overflow-x:auto">
+<table>
+<thead><tr><th>Cyclone</th><th>Wind (kt)</th><th>Latitude</th><th>Longitude</th></tr></thead>
+<tbody>
+<tr><td>UNNAMED</td><td>25.0</td><td>14.8</td><td>-120.5</td></tr>
+<tr><td>SIMON</td><td>41.6</td><td>15.5</td><td>-102.2</td></tr>
+<tr><td>NOLO</td><td>51.6</td><td>26.9</td><td>156.0</td></tr>
+<tr><td>RACHEL</td><td>62.6</td><td>21.3</td><td>-122.6</td></tr>
+<tr><td>CHOI-WAN</td><td>69.2</td><td>42.5</td><td>156.7</td></tr>
+<tr><td>KOGUMA</td><td>54.0</td><td>16.9</td><td>161.2</td></tr>
+<tr><td>ISAIAS</td><td>64.0</td><td>22.7</td><td>-92.3</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">These are saved experimental estimates, not official forecasts. Observation dates may be outdated.</p>
+<p>Data source: NOAA IBTrACS. Values are from the project's saved predictions.</p>
+</div>
+</main>
+<footer>Developed by <strong>Manisha D</strong> · Hackathon Project</footer>
+</body>
+  </html>
