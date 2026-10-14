@@ -37,25 +37,48 @@ footer{text-align:center;padding:25px;color:#cbd5e1}
 
 <div class="section">
 <h2>🌐 Worldwide cyclone map</h2>
-<svg class="map" viewBox="0 0 800 400" role="img" aria-label="Illustrative world map with cyclone locations">
-<rect width="800" height="400" fill="#b9dff5"/>
-<g fill="#d9dfd8" stroke="#829ba8" stroke-width="1">
-<path d="M45 75 L90 40 160 48 210 85 190 125 145 140 120 185 82 160 65 120Z"/>
-<path d="M165 190 L215 210 230 265 205 330 175 285 160 235Z"/>
-<path d="M340 70 L390 45 435 70 420 105 370 110Z"/>
-<path d="M360 120 L425 110 470 150 450 220 415 275 390 225 375 170Z"/>
-<path d="M440 70 L520 40 620 55 720 100 685 150 620 145 580 185 520 145 470 125Z"/>
-<path d="M610 230 L675 220 720 260 690 310 635 300Z"/>
-</g>
-<g fill="#ef4444" stroke="white" stroke-width="2">
-<circle cx="535" cy="105" r="7"/><circle cx="555" cy="120" r="7"/>
-<circle cx="580" cy="90" r="7"/><circle cx="230" cy="150" r="7"/>
-<circle cx="205" cy="175" r="7"/><circle cx="250" cy="165" r="7"/>
-<circle cx="570" cy="150" r="7"/>
-</g>
-<text x="20" y="380" fill="#17324a" font-size="13">Illustrative locations only — not live geographic plotting</text>
-</svg>
-<p class="note">This illustration does not show verified current cyclone positions.</p>
+<div id="cyclone-map"
+     style="height:450px;width:100%;border-radius:12px;overflow:hidden;">
+</div>
+
+<link rel="stylesheet"
+ href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const map = L.map('cyclone-map').setView([20, 0], 2);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+const cyclones = [
+  ['UNNAMED', 14.8, -120.5, 25.0],
+  ['SIMON', 15.5, -102.2, 41.6],
+  ['NOLO', 26.9, 156.0, 51.6],
+  ['RACHEL', 21.3, -122.6, 62.6],
+  ['CHOI-WAN', 42.5, 156.7, 69.2],
+  ['KOGUMA', 16.9, 161.2, 54.0],
+  ['ISAIAS', 22.7, -92.3, 64.0]
+];
+
+cyclones.forEach(c => {
+  L.circleMarker([c[1], c[2]], {
+    radius: 7,
+    color: '#ffffff',
+    weight: 2,
+    fillColor: '#ef4444',
+    fillOpacity: 1
+  })
+  .addTo(map)
+  .bindPopup(
+    '<b>' + c[0] + '</b><br>Estimated wind: ' +
+    c[3] + ' knots<br>Latitude: ' + c[1] +
+    '<br>Longitude: ' + c[2]
+  );
+});
+</script>
 </div>
 
 <div class="section">
