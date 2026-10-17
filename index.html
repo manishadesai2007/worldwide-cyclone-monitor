@@ -1,106 +1,352 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Worldwide Tropical Cyclone Monitor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="author" content="Manisha Desai">
+<title>Worldwide Cyclone Monitor | Manisha Desai</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#101827;color:white}
-header{padding:25px 18px;background:#172338}
-h1{font-size:clamp(24px,5vw,38px);margin:0 0 10px}
-p{color:#cbd5e1;line-height:1.6}
-main{max-width:1000px;margin:auto;padding:18px}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
-.card{background:#263449;padding:20px;border-radius:14px}
-.card h2{font-size:27px;margin-bottom:5px}
-.section{background:#192538;margin-top:20px;padding:18px;border-radius:14px}
-.map{width:100%;height:auto;border-radius:10px;background:#c9e8f5}
-table{width:100%;border-collapse:collapse;margin-top:12px}
-th,td{text-align:left;padding:12px 8px;border-bottom:1px solid #39465a}
-th{color:#93c5fd}
-.note{font-size:13px;color:#fbbf24}
-footer{text-align:center;padding:25px;color:#cbd5e1}
+body{margin:0;background:#090e19;color:#e5edff;font-family:Arial,sans-serif;font-size:13px}
+header{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;padding:16px 20px;background:#101827;border-bottom:1px solid #29354b}
+.brand{font-size:21px;font-weight:bold;color:#72d5ff}
+.sub{color:#9aabc5;font-size:11px;margin-top:5px}
+.stats{display:flex;gap:22px;flex-wrap:wrap}
+.stat span{display:block;color:#9eacc5;font-size:10px}
+.stat strong{display:block;margin-top:5px;font-size:16px}
+.live{color:#ff7284}
+.layout{display:grid;grid-template-columns:155px minmax(0,1fr);gap:12px;padding:12px}
+nav,.panel{background:#111a2b;border:1px solid #26354c;border-radius:9px}
+nav{padding:10px;height:max-content}
+nav div{padding:13px 8px;color:#a7b5ce;border-radius:6px}
+nav .selected{background:#244b81;color:#fff}
+main{min-width:0}
+.main-grid{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:12px}
+.panel{padding:12px;margin-bottom:12px;min-width:0}
+h3{font-size:13px;margin:0 0 12px}
+.muted{color:#94a6c3;font-size:11px}
+#map{height:475px;width:100%;border-radius:7px;background:#17243a}
+.map-wrap{position:relative}
+.storm-box{position:absolute;z-index:500;top:48px;left:18px;width:205px;background:#111a2bed;border:1px solid #35445e;border-radius:10px;padding:12px}
+.storm-item{padding:10px 3px;border-bottom:1px solid #29374d;cursor:pointer}
+.storm-item:last-child{border:0}
+.storm-item b{display:block;margin-bottom:5px}
+.pill{font-size:10px;padding:4px 6px;border-radius:5px;background:#542b3a;color:#ffabb9}
+.btn{background:#1b3d69;color:#9cddff;border:1px solid #315a8d;border-radius:5px;padding:7px 10px;cursor:pointer}
+.detail-name{font-size:20px;font-weight:bold;margin:10px 0}
+.category{display:inline-block;background:#6a2d3d;color:#ffc2cc;border-radius:5px;padding:6px;margin:4px 0 10px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tabs span{padding:6px 2px;color:#9aabc4}
+.tabs .on{color:#70cfff;border-bottom:2px solid #70cfff}
+.satellite-art{height:170px;border-radius:50%;margin:15px auto;width:170px;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#101827 0 8%,#d6c5f6 10%,#7867e8 23%,#3d8ef3 38%,#b14ae0 53%,#202c71 67%,#111a2b 72%);box-shadow:0 0 32px #5546be66}
+.satellite-art:after{content:"";width:36px;height:36px;border-radius:50%;background:#090e19;box-shadow:0 0 15px #fff}
+.bottom-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:12px}
+.chart-area{height:205px}
+table{width:100%;border-collapse:collapse;font-size:11px}
+td,th{text-align:left;padding:10px 5px;border-bottom:1px solid #29364b}
+th{color:#90a5c6;font-weight:normal}
+.risk{color:#ff8b8b;font-weight:bold}
+.timeline{display:flex;justify-content:space-between;align-items:center;gap:6px;overflow:auto;padding:14px 0}
+.timepoint{min-width:45px;text-align:center;color:#9aabc4;font-size:10px}
+.dot{width:20px;height:20px;border-radius:50%;background:#d95368;margin:8px auto}
+.legend{position:absolute;bottom:25px;left:15px;z-index:400;background:#111a2bef;padding:10px;border-radius:7px;font-size:10px;line-height:2}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#111a2b;color:white}
+footer{padding:15px 20px;color:#8395b2;font-size:11px;border-top:1px solid #29354b}
+@media(max-width:1050px){
+.layout{grid-template-columns:1fr}
+nav{display:flex;gap:4px;overflow-x:auto}
+nav div{white-space:nowrap}
+.main-grid{grid-template-columns:minmax(0,1fr) 250px}
+}
+@media(max-width:720px){
+header{align-items:flex-start}
+.stats{gap:12px}
+.main-grid,.bottom-grid{grid-template-columns:1fr}
+#map{height:420px}
+.storm-box{width:175px}
+.chart-area{height:220px}
+}
 </style>
 </head>
+
 <body>
 <header>
-<h1>🌍 Worldwide Tropical Cyclone Monitor</h1>
-<p>Explore recorded cyclone locations and experimental wind estimates.</p>
+ <div>
+  <div class="brand">🌪 Worldwide Cyclone Monitor</div>
+  <div class="sub">Tropical Cyclone Tracking &amp; Risk Intelligence · Created by Manisha Desai</div>
+ </div>
+ <div class="stats">
+  <div class="stat"><span>DATA STATUS</span><strong class="live">DEMO</strong></div>
+  <div class="stat"><span>CYCLONES</span><strong id="count">3</strong></div>
+  <div class="stat"><span>MONITORING</span><strong>Global</strong></div>
+  <div class="stat"><span>DATA SOURCE</span><strong>NOAA / DB</strong></div>
+ </div>
 </header>
+
+<div class="layout">
+<nav aria-label="Main navigation">
+ <div>🌐 Global View</div>
+ <div class="selected">◉ Live Tracking</div>
+ <div>⌁ Regional Analysis</div>
+ <div>◈ Forecast Models</div>
+ <div>⚠ Impact Assessment</div>
+ <div>♧ Emergency Planning</div>
+ <div>♧ Alerts &amp; Notices</div>
+ <div>▤ Reports</div>
+ <div>▦ Data Sources</div>
+ <div>⚙ Settings</div>
+</nav>
+
 <main>
-<div class="cards">
-<div class="card"><p>Storms tracked</p><h2>7</h2></div>
-<div class="card"><p>Highest estimated wind</p><h2>69.2 kt</h2></div>
-<div class="card"><p>Average estimated wind</p><h2>52.6 kt</h2></div>
+<div class="main-grid">
+ <section class="panel">
+  <h3>🌍 Satellite Tracking Map
+   <button class="btn" style="float:right" onclick="showAll()">Show all</button>
+  </h3>
+
+  <div class="map-wrap">
+   <div id="map"></div>
+
+   <div class="storm-box">
+    <b>ACTIVE CYCLONES <span class="muted">(DEMO)</span></b>
+    <div id="stormList"></div>
+   </div>
+
+   <div class="legend">
+    <b>WIND SPEED · km/h</b><br>
+    🟣 200+ &nbsp; 🔴 150–200<br>
+    🟠 100–150 &nbsp; 🟡 60–100<br>
+    🔵 Below 60
+   </div>
+  </div>
+
+  <p class="muted">Illustrative tracks. Not for navigation or emergency decisions.</p>
+
+  <h3>Cyclone Track Timeline</h3>
+  <div class="timeline">
+   <div class="timepoint">T−24h<div class="dot"></div></div>
+   <div class="timepoint">T−18h<div class="dot"></div></div>
+   <div class="timepoint">T−12h<div class="dot"></div></div>
+   <div class="timepoint">T−6h<div class="dot"></div></div>
+   <div class="timepoint">Latest demo<div class="dot"></div></div>
+  </div>
+ </section>
+
+ <aside>
+  <section class="panel">
+   <div class="muted">SELECTED CYCLONE</div>
+   <div class="detail-name" id="stormName">DEMO REMAL</div>
+   <div class="category" id="category">Category 3 · Demo</div>
+   <div id="details"></div>
+
+   <div class="tabs">
+    <span>Overview</span>
+    <span>Forecast</span>
+    <span class="on">Satellite</span>
+   </div>
+
+   <div class="muted">ILLUSTRATIVE SATELLITE VIEW</div>
+   <div class="satellite-art" aria-label="Decorative illustration, not a satellite image"></div>
+   <div class="muted">Illustration only · Not an actual satellite image</div>
+  </section>
+
+  <section class="panel">
+   <h3>Wind Speed History</h3>
+   <div class="chart-area"><canvas id="windChart"></canvas></div>
+  </section>
+ </aside>
 </div>
 
-<div class="section">
-<h2>🌐 Worldwide cyclone map</h2>
-<div id="cyclone-map"
-     style="height:450px;width:100%;border-radius:12px;overflow:hidden;">
-</div>
+<div class="bottom-grid">
+ <section class="panel">
+  <h3>Intensity Trend · Illustrative</h3>
+  <div class="chart-area"><canvas id="trendChart"></canvas></div>
+ </section>
 
-<link rel="stylesheet"
- href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script>
-const map = L.map('cyclone-map').setView([20, 0], 2);
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
-}).addTo(map);
-
-const cyclones = [
-  ['UNNAMED', 14.8, -120.5, 25.0],
-  ['SIMON', 15.5, -102.2, 41.6],
-  ['NOLO', 26.9, 156.0, 51.6],
-  ['RACHEL', 21.3, -122.6, 62.6],
-  ['CHOI-WAN', 42.5, 156.7, 69.2],
-  ['KOGUMA', 16.9, 161.2, 54.0],
-  ['ISAIAS', 22.7, -92.3, 64.0]
-];
-
-cyclones.forEach(c => {
-  L.circleMarker([c[1], c[2]], {
-    radius: 7,
-    color: '#ffffff',
-    weight: 2,
-    fillColor: '#ef4444',
-    fillOpacity: 1
-  })
-  .addTo(map)
-  .bindPopup(
-    '<b>' + c[0] + '</b><br>Estimated wind: ' +
-    c[3] + ' knots<br>Latitude: ' + c[1] +
-    '<br>Longitude: ' + c[2]
-  );
-});
-</script>
-</div>
-
-<div class="section">
-<h2>📊 Experimental wind estimates</h2>
-<div style="overflow-x:auto">
-<table>
-<thead><tr><th>Cyclone</th><th>Wind (kt)</th><th>Latitude</th><th>Longitude</th></tr></thead>
-<tbody>
-<tr><td>UNNAMED</td><td>25.0</td><td>14.8</td><td>-120.5</td></tr>
-<tr><td>SIMON</td><td>41.6</td><td>15.5</td><td>-102.2</td></tr>
-<tr><td>NOLO</td><td>51.6</td><td>26.9</td><td>156.0</td></tr>
-<tr><td>RACHEL</td><td>62.6</td><td>21.3</td><td>-122.6</td></tr>
-<tr><td>CHOI-WAN</td><td>69.2</td><td>42.5</td><td>156.7</td></tr>
-<tr><td>KOGUMA</td><td>54.0</td><td>16.9</td><td>161.2</td></tr>
-<tr><td>ISAIAS</td><td>64.0</td><td>22.7</td><td>-92.3</td></tr>
-</tbody>
-</table>
-</div>
-<p class="note">These are saved experimental estimates, not official forecasts. Observation dates may be outdated.</p>
-<p>Data source: NOAA IBTrACS. Values are from the project's saved predictions.</p>
+ <section class="panel">
+  <h3>Key Locations Along Track</h3>
+  <table>
+   <thead>
+    <tr><th>Location</th><th>Risk</th><th>Max Wind</th></tr>
+   </thead>
+   <tbody id="riskTable"></tbody>
+  </table>
+ </section>
 </div>
 </main>
-<footer>Developed by <strong>Manisha D</strong> · Hackathon Project</footer>
+</div>
+
+<footer>
+ <div><strong>Worldwide Cyclone Monitor</strong> · Created by <strong>Manisha Desai</strong></div>
+ <div style="margin-top:6px">
+  Educational prototype. Demo values are not live readings.
+  Estimates are not official forecasts. Check official meteorological agencies for warnings.
+ </div>
+</footer>
+
+<script>
+const storms=[
+ {
+  name:"DEMO REMAL",cat:"Category 3",wind:110,pressure:965,color:"#ff647c",
+  track:[[16,88],[18,87.5],[20,87],[22,86],[24,85]],
+  history:[65,90,110,98,75]
+ },
+ {
+  name:"DEMO INVEST 94B",cat:"Category 2",wind:85,pressure:985,color:"#ffb454",
+  track:[[12,91],[14,90],[16,89],[18,88]],
+  history:[35,48,65,85,80]
+ },
+ {
+  name:"DEMO SYSTEM 91W",cat:"Category 1",wind:65,pressure:1000,color:"#55d9f7",
+  track:[[8,83],[10,84],[12,85],[14,86]],
+  history:[25,35,48,58,65]
+ }
+];
+
+const map=L.map("map").setView([19,85],4);
+
+L.tileLayer(
+ "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+ {attribution:"Tiles © Esri",maxZoom:18}
+).addTo(map);
+
+L.tileLayer(
+ "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png",
+ {attribution:"Labels © CARTO",subdomains:"abcd",maxZoom:18}
+).addTo(map);
+
+const lines=[];
+const markers=[];
+
+storms.forEach((s,i)=>{
+ const line=L.polyline(s.track,{
+  color:s.color,weight:4,opacity:.9
+ }).addTo(map);
+
+ lines.push(line);
+
+ s.track.forEach((p,j)=>{
+  if(j<s.track.length-1){
+   L.circleMarker(p,{
+    radius:4,color:s.color,fillColor:s.color,fillOpacity:.9
+   }).addTo(map);
+  }
+ });
+
+ const marker=L.circleMarker(s.track[s.track.length-1],{
+  radius:8,color:"#fff",weight:2,fillColor:s.color,fillOpacity:1
+ }).addTo(map);
+
+ marker.bindPopup(
+  "<b>"+s.name+"</b><br>"+s.wind+" km/h<br>Illustrative demo data"
+ );
+
+ marker.on("click",()=>selectStorm(i));
+ markers.push(marker);
+
+ document.getElementById("stormList").innerHTML+=
+  '<div class="storm-item" onclick="selectStorm('+i+')">'+
+  '<b style="color:'+s.color+'">● '+s.name+'</b>'+
+  '<span class="muted">'+s.wind+' km/h · '+s.pressure+' hPa</span><br>'+
+  '<span class="pill">'+s.cat+'</span></div>';
+});
+
+document.getElementById("count").textContent=storms.length;
+
+const chartOptions={
+ responsive:true,
+ maintainAspectRatio:false,
+ plugins:{
+  legend:{
+   labels:{color:"#cbd8f0",boxWidth:10,font:{size:10}}
+  }
+ },
+ scales:{
+  x:{
+   ticks:{color:"#8fa5c5",font:{size:9}},
+   grid:{color:"#28354b"}
+  },
+  y:{
+   ticks:{color:"#8fa5c5",font:{size:9}},
+   grid:{color:"#28354b"}
+  }
+ }
+};
+
+const windChart=new Chart(document.getElementById("windChart"),{
+ type:"line",
+ data:{
+  labels:["T−24h","T−18h","T−12h","T−6h","Latest demo"],
+  datasets:[{
+   label:"Wind km/h",
+   data:storms[0].history,
+   borderColor:storms[0].color,
+   backgroundColor:storms[0].color,
+   tension:.3,
+   pointRadius:3
+  }]
+ },
+ options:chartOptions
+});
+
+new Chart(document.getElementById("trendChart"),{
+ type:"line",
+ data:{
+  labels:["T−24h","T−18h","T−12h","T−6h","Latest demo"],
+  datasets:storms.map(s=>({
+   label:s.name,
+   data:s.history,
+   borderColor:s.color,
+   backgroundColor:s.color,
+   tension:.3,
+   pointRadius:2
+  }))
+ },
+ options:chartOptions
+});
+
+document.getElementById("riskTable").innerHTML=[
+ ["Puri","HIGH","Illustrative"],
+ ["Paradip","HIGH","Illustrative"],
+ ["Cuttack","MODERATE","Illustrative"],
+ ["Bhubaneswar","MODERATE","Illustrative"]
+].map(r=>
+ "<tr><td>"+r[0]+"</td><td class='risk'>"+r[1]+"</td><td>"+r[2]+"</td></tr>"
+).join("");
+
+function selectStorm(i){
+ const s=storms[i];
+
+ document.getElementById("stormName").textContent=s.name;
+ document.getElementById("category").textContent=s.cat+" · Demo";
+
+ document.getElementById("details").innerHTML=
+  '<p><span class="muted">Wind speed</span><br><b>'+s.wind+' km/h</b></p>'+
+  '<p><span class="muted">Pressure</span><br><b>'+s.pressure+' hPa</b></p>'+
+  '<p><span class="muted">Data timestamp</span><br><b>Demo data — no live timestamp</b></p>';
+
+ windChart.data.datasets[0].data=s.history;
+ windChart.data.datasets[0].borderColor=s.color;
+ windChart.data.datasets[0].backgroundColor=s.color;
+ windChart.data.datasets[0].label=s.name+" (demo)";
+ windChart.update();
+
+ map.panTo(s.track[s.track.length-1]);
+}
+
+function showAll(){
+ const group=L.featureGroup([...lines,...markers]);
+ if(group.getLayers().length){
+  map.fitBounds(group.getBounds(),{padding:[35,35]});
+ }
+}
+
+selectStorm(0);
+</script>
 </body>
-  </html> 
+</html>
