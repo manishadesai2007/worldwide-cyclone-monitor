@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="author" content="Manisha Desai">
 <title>Worldwide Cyclone Monitor | Manisha Desai</title>
+
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -57,6 +58,7 @@ th{color:#90a5c6;font-weight:normal}
 .legend{position:absolute;bottom:25px;left:15px;z-index:400;background:#111a2bef;padding:10px;border-radius:7px;font-size:10px;line-height:2}
 .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#111a2b;color:white}
 footer{padding:15px 20px;color:#8395b2;font-size:11px;border-top:1px solid #29354b}
+
 @media(max-width:1050px){
 .layout{grid-template-columns:1fr}
 nav{display:flex;gap:4px;overflow-x:auto}
@@ -80,11 +82,12 @@ header{align-items:flex-start}
   <div class="brand">🌪 Worldwide Cyclone Monitor</div>
   <div class="sub">Tropical Cyclone Tracking &amp; Risk Intelligence · Created by Manisha Desai</div>
  </div>
+
  <div class="stats">
   <div class="stat"><span>DATA STATUS</span><strong class="live">DEMO</strong></div>
-  <div class="stat"><span>CYCLONES</span><strong id="count">3</strong></div>
+  <div class="stat"><span>CYCLONES</span><strong id="count">6</strong></div>
   <div class="stat"><span>MONITORING</span><strong>Global</strong></div>
-  <div class="stat"><span>DATA SOURCE</span><strong>NOAA / DB</strong></div>
+  <div class="stat"><span>DATA SOURCE</span><strong>Illustrative</strong></div>
  </div>
 </header>
 
@@ -105,15 +108,15 @@ header{align-items:flex-start}
 <main>
 <div class="main-grid">
  <section class="panel">
-  <h3>🌍 Satellite Tracking Map
-   <button class="btn" style="float:right" onclick="showAll()">Show all</button>
+  <h3>🌍 Worldwide Satellite Map
+   <button class="btn" style="float:right" onclick="showAll()">Show world</button>
   </h3>
 
   <div class="map-wrap">
-   <div id="map"></div>
+   <div id="map" aria-label="World map showing illustrative cyclone tracks"></div>
 
    <div class="storm-box">
-    <b>ACTIVE CYCLONES <span class="muted">(DEMO)</span></b>
+    <b>CYCLONE TRACKS <span class="muted">(DEMO)</span></b>
     <div id="stormList"></div>
    </div>
 
@@ -125,7 +128,7 @@ header{align-items:flex-start}
    </div>
   </div>
 
-  <p class="muted">Illustrative tracks. Not for navigation or emergency decisions.</p>
+  <p class="muted">Illustrative tracks across ocean basins. Not for navigation or emergency decisions.</p>
 
   <h3>Cyclone Track Timeline</h3>
   <div class="timeline">
@@ -140,8 +143,8 @@ header{align-items:flex-start}
  <aside>
   <section class="panel">
    <div class="muted">SELECTED CYCLONE</div>
-   <div class="detail-name" id="stormName">DEMO REMAL</div>
-   <div class="category" id="category">Category 3 · Demo</div>
+   <div class="detail-name" id="stormName">DEMO NORTH ATLANTIC</div>
+   <div class="category" id="category">Illustrative · Demo</div>
    <div id="details"></div>
 
    <div class="tabs">
@@ -169,10 +172,10 @@ header{align-items:flex-start}
  </section>
 
  <section class="panel">
-  <h3>Key Locations Along Track</h3>
+  <h3>Illustrative Locations Along Tracks</h3>
   <table>
    <thead>
-    <tr><th>Location</th><th>Risk</th><th>Max Wind</th></tr>
+    <tr><th>Region</th><th>Risk</th><th>Wind</th></tr>
    </thead>
    <tbody id="riskTable"></tbody>
   </table>
@@ -184,40 +187,95 @@ header{align-items:flex-start}
 <footer>
  <div><strong>Worldwide Cyclone Monitor</strong> · Created by <strong>Manisha Desai</strong></div>
  <div style="margin-top:6px">
-  Educational prototype. Demo values are not live readings.
-  Estimates are not official forecasts. Check official meteorological agencies for warnings.
+  Educational prototype. Cyclone locations, tracks, wind speeds and risk examples are invented for demonstration. They are not live readings or official forecasts. Check official meteorological agencies for warnings.
  </div>
 </footer>
 
 <script>
-const storms=[
+// IMPORTANT:
+// These are invented demo examples in different ocean basins.
+// They are NOT actual current cyclones.
+
+const storms = [
  {
-  name:"DEMO REMAL",cat:"Category 3",wind:110,pressure:965,color:"#ff647c",
-  track:[[16,88],[18,87.5],[20,87],[22,86],[24,85]],
-  history:[65,90,110,98,75]
+  name:"DEMO NORTH ATLANTIC",
+  region:"North Atlantic",
+  cat:"Illustrative",
+  wind:120,
+  pressure:970,
+  color:"#ff647c",
+  track:[[12,-48],[15,-52],[19,-56],[23,-59],[27,-61]],
+  history:[55,78,105,120,110]
  },
  {
-  name:"DEMO INVEST 94B",cat:"Category 2",wind:85,pressure:985,color:"#ffb454",
-  track:[[12,91],[14,90],[16,89],[18,88]],
-  history:[35,48,65,85,80]
+  name:"DEMO EASTERN PACIFIC",
+  region:"Eastern Pacific",
+  cat:"Illustrative",
+  wind:95,
+  pressure:985,
+  color:"#ffb454",
+  track:[[10,-125],[12,-121],[15,-117],[18,-114],[21,-111]],
+  history:[30,45,65,95,90]
  },
  {
-  name:"DEMO SYSTEM 91W",cat:"Category 1",wind:65,pressure:1000,color:"#55d9f7",
-  track:[[8,83],[10,84],[12,85],[14,86]],
-  history:[25,35,48,58,65]
+  name:"DEMO WESTERN PACIFIC",
+  region:"Western Pacific",
+  cat:"Illustrative",
+  wind:145,
+  pressure:955,
+  color:"#bd86ff",
+  track:[[12,135],[15,140],[18,145],[21,149],[24,152]],
+  history:[65,90,120,145,135]
+ },
+ {
+  name:"DEMO NORTH INDIAN OCEAN",
+  region:"North Indian Ocean",
+  cat:"Illustrative",
+  wind:85,
+  pressure:990,
+  color:"#55d9f7",
+  track:[[8,78],[10,81],[13,84],[16,87],[19,89]],
+  history:[25,40,60,85,80]
+ },
+ {
+  name:"DEMO SOUTH INDIAN OCEAN",
+  region:"South Indian Ocean",
+  cat:"Illustrative",
+  wind:105,
+  pressure:975,
+  color:"#8be28b",
+  track:[[-12,70],[-15,75],[-18,80],[-21,84],[-24,87]],
+  history:[35,55,75,105,100]
+ },
+ {
+  name:"DEMO SOUTH PACIFIC",
+  region:"South Pacific",
+  cat:"Illustrative",
+  wind:70,
+  pressure:1000,
+  color:"#f0d66a",
+  track:[[-12,165],[-15,170],[-18,175],[-21,178],[-24,174]],
+  history:[20,35,50,70,65]
  }
 ];
 
-const map=L.map("map").setView([19,85],4);
+// Start with the entire world visible.
+const map = L.map("map", {
+ worldCopyJump:true,
+ minZoom:2,
+ maxBounds:[[-85,-180],[85,180]],
+ maxBoundsViscosity:0.8
+}).setView([15,0],2);
 
+// Satellite imagery layer. Esri attribution is retained.
+// If this provider displays its own access warning, use the fallback below.
 L.tileLayer(
  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
- {attribution:"Tiles © Esri",maxZoom:18}
-).addTo(map);
-
-L.tileLayer(
- "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png",
- {attribution:"Labels © CARTO",subdomains:"abcd",maxZoom:18}
+ {
+  attribution:"Tiles © Esri",
+  maxZoom:18,
+  noWrap:true
+ }
 ).addTo(map);
 
 const lines=[];
@@ -225,25 +283,38 @@ const markers=[];
 
 storms.forEach((s,i)=>{
  const line=L.polyline(s.track,{
-  color:s.color,weight:4,opacity:.9
+  color:s.color,
+  weight:3.5,
+  opacity:.95
  }).addTo(map);
 
  lines.push(line);
 
- s.track.forEach((p,j)=>{
+ s.track.forEach((point,j)=>{
   if(j<s.track.length-1){
-   L.circleMarker(p,{
-    radius:4,color:s.color,fillColor:s.color,fillOpacity:.9
+   L.circleMarker(point,{
+    radius:4,
+    color:s.color,
+    fillColor:s.color,
+    fillOpacity:.95,
+    weight:1
    }).addTo(map);
   }
  });
 
  const marker=L.circleMarker(s.track[s.track.length-1],{
-  radius:8,color:"#fff",weight:2,fillColor:s.color,fillOpacity:1
+  radius:7,
+  color:"#fff",
+  weight:2,
+  fillColor:s.color,
+  fillOpacity:1
  }).addTo(map);
 
  marker.bindPopup(
-  "<b>"+s.name+"</b><br>"+s.wind+" km/h<br>Illustrative demo data"
+  "<b>"+s.name+"</b><br>"+
+  s.region+"<br>"+
+  s.wind+" km/h<br>"+
+  "Illustrative demo data"
  );
 
  marker.on("click",()=>selectStorm(i));
@@ -252,8 +323,8 @@ storms.forEach((s,i)=>{
  document.getElementById("stormList").innerHTML+=
   '<div class="storm-item" onclick="selectStorm('+i+')">'+
   '<b style="color:'+s.color+'">● '+s.name+'</b>'+
-  '<span class="muted">'+s.wind+' km/h · '+s.pressure+' hPa</span><br>'+
-  '<span class="pill">'+s.cat+'</span></div>';
+  '<span class="muted">'+s.region+' · '+s.wind+' km/h</span><br>'+
+  '<span class="pill">DEMO ONLY</span></div>';
 });
 
 document.getElementById("count").textContent=storms.length;
@@ -263,7 +334,11 @@ const chartOptions={
  maintainAspectRatio:false,
  plugins:{
   legend:{
-   labels:{color:"#cbd8f0",boxWidth:10,font:{size:10}}
+   labels:{
+    color:"#cbd8f0",
+    boxWidth:10,
+    font:{size:10}
+   }
   }
  },
  scales:{
@@ -299,7 +374,7 @@ new Chart(document.getElementById("trendChart"),{
  data:{
   labels:["T−24h","T−18h","T−12h","T−6h","Latest demo"],
   datasets:storms.map(s=>({
-   label:s.name,
+   label:s.region,
    data:s.history,
    borderColor:s.color,
    backgroundColor:s.color,
@@ -310,13 +385,10 @@ new Chart(document.getElementById("trendChart"),{
  options:chartOptions
 });
 
-document.getElementById("riskTable").innerHTML=[
- ["Puri","HIGH","Illustrative"],
- ["Paradip","HIGH","Illustrative"],
- ["Cuttack","MODERATE","Illustrative"],
- ["Bhubaneswar","MODERATE","Illustrative"]
-].map(r=>
- "<tr><td>"+r[0]+"</td><td class='risk'>"+r[1]+"</td><td>"+r[2]+"</td></tr>"
+document.getElementById("riskTable").innerHTML=storms.map(s=>
+ "<tr><td>"+s.region+"</td>"+
+ "<td class='risk'>Demo only</td>"+
+ "<td>"+s.wind+" km/h</td></tr>"
 ).join("");
 
 function selectStorm(i){
@@ -326,24 +398,22 @@ function selectStorm(i){
  document.getElementById("category").textContent=s.cat+" · Demo";
 
  document.getElementById("details").innerHTML=
-  '<p><span class="muted">Wind speed</span><br><b>'+s.wind+' km/h</b></p>'+
-  '<p><span class="muted">Pressure</span><br><b>'+s.pressure+' hPa</b></p>'+
-  '<p><span class="muted">Data timestamp</span><br><b>Demo data — no live timestamp</b></p>';
+  '<p><span class="muted">Region</span><br><b>'+s.region+'</b></p>'+
+  '<p><span class="muted">Illustrative wind speed</span><br><b>'+s.wind+' km/h</b></p>'+
+  '<p><span class="muted">Illustrative pressure</span><br><b>'+s.pressure+' hPa</b></p>'+
+  '<p><span class="muted">Timestamp</span><br><b>Demo data — not live</b></p>';
 
  windChart.data.datasets[0].data=s.history;
  windChart.data.datasets[0].borderColor=s.color;
  windChart.data.datasets[0].backgroundColor=s.color;
- windChart.data.datasets[0].label=s.name+" (demo)";
+ windChart.data.datasets[0].label=s.region+" (demo)";
  windChart.update();
 
  map.panTo(s.track[s.track.length-1]);
 }
 
 function showAll(){
- const group=L.featureGroup([...lines,...markers]);
- if(group.getLayers().length){
-  map.fitBounds(group.getBounds(),{padding:[35,35]});
- }
+ map.setView([15,0],2);
 }
 
 selectStorm(0);
